@@ -7,9 +7,15 @@ import (
 	"strings"
 )
 
+// Query encapsulates necessary bits of gocql.Query
+type Query interface {
+	Bind(...interface{}) *gocql.Query
+	Iter() *gocql.Iter
+}
+
 type Binding struct {
 	err        error
-	qry        *gocql.Query
+	qry        Query
 	iter       *gocql.Iter
 	stmt       string
 	arg        interface{}
@@ -21,7 +27,7 @@ type Binding struct {
 	fieldMap   map[string][]int
 }
 
-func BindQuery(q *gocql.Query) *Binding {
+func BindQuery(q Query) *Binding {
 	return &Binding{
 		qry:      q,
 		strategy: make(map[string]reflect.Value),
